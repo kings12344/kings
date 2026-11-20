@@ -213,16 +213,20 @@ public class MainActivity extends Activity {
                 return;
             }
         }
-        Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".provider", currentProfile);
-        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        intent.setDataAndType(uri, "application/x-openvpn-profile");
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        ResolveInfo handler = getPackageManager().resolveActivity(intent, 0);
-        if (handler == null) {
-            Toast.makeText(this, "Install an OpenVPN-compatible client first", Toast.LENGTH_LONG).show();
-            return;
+        try {
+            Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".provider", currentProfile);
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            intent.setDataAndType(uri, "application/x-openvpn-profile");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            ResolveInfo handler = getPackageManager().resolveActivity(intent, 0);
+            if (handler == null) {
+                Toast.makeText(this, "Install an OpenVPN-compatible client first", Toast.LENGTH_LONG).show();
+                return;
+            }
+            startActivity(Intent.createChooser(intent, "Open VPN profile with"));
+        } catch (Exception error) {
+            Toast.makeText(this, "Could not open the profile: " + friendlyMessage(error), Toast.LENGTH_LONG).show();
         }
-        startActivity(Intent.createChooser(intent, "Open VPN profile with"));
     }
 
     private void removeProfile() {
